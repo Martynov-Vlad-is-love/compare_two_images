@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 class ImageComparison extends ChangeNotifier {
   /// First image
   File? firstImage;
+
   /// SecondImage
   File? secondImage;
 
@@ -48,7 +49,6 @@ class ImageComparison extends ChangeNotifier {
       final Uint8List? bytes2 = await secondImage?.readAsBytes();
       _differencePercentage = await _compareImagesBytes(bytes1, bytes2);
     }
-
   }
 
   Future<double> _compareImagesBytes(
