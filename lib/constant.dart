@@ -1,10 +1,13 @@
-// ignore_for_file: constant_identifier_names
+import 'package:flutter/material.dart';
 
-/// Constant values
+/// Constant values.
 class Constant {
-  /// Count of bytes per pixel
-  static const COUNT_OF_BYTES_PER_PIXEl = 4;
+  /// Red color.
+  static const Color redColor = Colors.red;
 
-  /// Percent
-  static const PERCENT = 100.0;
+  /// Green color.
+  static const Color greenColor = Colors.green;
+
+  /// Grey color.
+  static const Color greyColor = Colors.grey;
 }
