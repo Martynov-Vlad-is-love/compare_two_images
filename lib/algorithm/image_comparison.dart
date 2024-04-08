@@ -1,33 +1,63 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:compare_two_images/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_pixels/image_pixels.dart';
 
 /// Image comparison class
 class ImageComparison extends ChangeNotifier {
-  /// First image
-  File? firstImage;
+  File? _firstFileImage;
+  File? _secondFileImage;
+  ui.Image? _firstImage;
+  ui.Image? _secondImage;
+  ImgDetails? firstImageDetails;
+  ImgDetails? secondImageDetails;
+  List<ui.Offset> differences = [];
 
-  /// SecondImage
-  File? secondImage;
+  /// Difference of images in bool value
+  bool isImageDifferent = false;
 
-  //ignore: unused_field
-  double _differencePercentage = 0.0;
+  /// Get first image
+  ui.Image? get firstImage => _firstImage;
 
-  /// Method to take image from gallery
-  Future<void> getFirstImageFromGallery() async {
-    firstImage = await _getImageFromGallery();
+  /// Get first image
+  ui.Image? get secondImage => _secondImage;
+
+  /// Get first image file
+  File? get firstFileImage => _firstFileImage;
+
+  /// Get second image file
+  File? get secondFileImage => _secondFileImage;
+
+  /// Method to set image from gallery
+  Future<void> setFirstImageFromGallery() async {
+    _firstFileImage = await _getImageFromGallery();
+    final img = _firstFileImage?.readAsBytes();
+    if (img != null) {
+      _firstImage = await decodeImageFromList(img as Uint8List);
+    }
     notifyListeners();
   }
 
-  /// Method to take image from gallery
-  Future<void> getSecondImageFromGallery() async {
-    secondImage = await _getImageFromGallery();
+  /// Method to set image from gallery
+  Future<void> setSecondImageFromGallery() async {
+    _secondFileImage = await _getImageFromGallery();
+    final img = _firstFileImage?.readAsBytes();
+    if (img != null) {
+      _secondImage = await decodeImageFromList(img as Uint8List);
+    }
     notifyListeners();
+  }
+
+  Future<ui.Image?> getImageFromFile(File? file) async {
+    if (file != null) {
+      return decodeImageFromList(file as Uint8List);
+    }
+
+    return null;
   }
 
   /// Method to take image from gallery
@@ -42,13 +72,41 @@ class ImageComparison extends ChangeNotifier {
     return null;
   }
 
+  Future<void> findDifferences(ImgDetails firstImageDetails, ImgDetails secondImageDetails) async {
+    final details = firstImageDetails.uiImage;
+    Color firstPixel = Colors.grey;
+    Color secondPixel = Colors.grey;
+    final int? height = firstImageDetails.height;
+    final int? width = firstImageDetails.width;
+
+    if (height != null && width != null) {
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          firstPixel = firstImageDetails.pixelColorAt!(height,width);
+          firstPixel = secondImageDetails.pixelColorAt!(height,width);
+          if(firstPixel != secondPixel){
+            final pixel = ui.Offset(height as double, width as double);
+            differences.add(pixel);
+          }
+        }
+      }
+
+      print('Количество отличающихся пикселей: ${differences.length}');
+    }
+  }
+
   /// Method to compare two images
   Future<void> compareImages() async {
-    if (firstImage != null && secondImage != null) {
-      final Uint8List? bytes1 = await firstImage?.readAsBytes();
-      final Uint8List? bytes2 = await secondImage?.readAsBytes();
-      _differencePercentage = await _compareImagesBytes(bytes1, bytes2);
-    }
+    double differencePercentage = 0.0;
+
+    final Uint8List? bytes1 = await firstFileImage?.readAsBytes();
+    final Uint8List? bytes2 = await secondFileImage?.readAsBytes();
+    differencePercentage = await _compareImagesBytes(bytes1, bytes2);
+
+    //ignore: avoid_bool_literals_in_conditional_expressions
+    isImageDifferent = differencePercentage == 0.0 ? true : false;
+
+    notifyListeners();
   }
 
   Future<double> _compareImagesBytes(
@@ -61,18 +119,20 @@ class ImageComparison extends ChangeNotifier {
       final ui.Image image1 = await decodeImageFromList(image1Bytes);
       final ui.Image image2 = await decodeImageFromList(image2Bytes);
 
-      if (image1.width != image2.width || image1.height != image2.height) {
-        throw ArgumentError("Images must have the same dimensions");
-      }
-
+      int pixelLengthInBytes = 0;
       int differentPixelsCount = 0;
       final ByteData? byteData1 = await image1.toByteData();
       final ByteData? byteData2 = await image2.toByteData();
       final Uint8List? pixels1 = byteData1?.buffer.asUint8List();
       final Uint8List? pixels2 = byteData2?.buffer.asUint8List();
-      final pixelLengthInBytes = pixels1?.lengthInBytes;
+      final firstPixelLengthInBytes = pixels1?.length;
+      final secondPixelLengthInBytes = pixels2?.length;
 
-      if (pixelLengthInBytes != null) {
+      if (firstPixelLengthInBytes != null && secondPixelLengthInBytes != null) {
+        pixelLengthInBytes = firstPixelLengthInBytes < secondPixelLengthInBytes
+            ? firstPixelLengthInBytes
+            : secondPixelLengthInBytes;
+
         for (int i = 0; i < pixelLengthInBytes; i++) {
           if (pixels1?[i] != pixels2?[i]) {
             differentPixelsCount++;
@@ -80,11 +140,9 @@ class ImageComparison extends ChangeNotifier {
         }
       }
 
-      if (pixelLengthInBytes != null) {
-        result = differentPixelsCount /
-            (pixelLengthInBytes / Constant.COUNT_OF_BYTES_PER_PIXEl) *
-            Constant.PERCENT;
-      }
+      result = differentPixelsCount / pixelLengthInBytes * Constant.PERCENT;
+
+      print('$result%');
     }
 
     return result;

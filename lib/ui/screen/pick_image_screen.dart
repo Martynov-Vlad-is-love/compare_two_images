@@ -1,4 +1,5 @@
-import 'package:flutter/widgets.dart';
+import 'package:compare_two_images/ui/widget/compare_widget.dart';
+import 'package:flutter/material.dart';
 
 /// Image picker screen
 class PickImageScreen extends StatelessWidget {
@@ -7,6 +8,6 @@ class PickImageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return MaterialApp(home: CompareWidget());
   }
 }
