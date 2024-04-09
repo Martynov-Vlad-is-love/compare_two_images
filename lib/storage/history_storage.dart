@@ -4,7 +4,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 class HistoryStorage {
   /// Method to add comparison results to storage.
   Future<void> addImageComparisonToHistoryStorage(
-      Map<String, dynamic> comparisonResult,) async {
+    Map<String, dynamic> comparisonResult,
+  ) async {
     final imagesHistoryBox = await Hive.openBox('imagesHistoryBox');
     await imagesHistoryBox.add(comparisonResult);
     await imagesHistoryBox.close();
@@ -15,7 +16,6 @@ class HistoryStorage {
     final imagesHistoryBox = await Hive.openBox('imagesHistoryBox');
 
     return imagesHistoryBox.values;
-
   }
 
   /// Method to delete comparison results to storage.

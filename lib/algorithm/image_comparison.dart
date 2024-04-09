@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:compare_two_images/algorithm/file_extension_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -33,9 +34,12 @@ class ImageComparison extends ChangeNotifier {
   /// Method to take image from gallery.
   Future<File?> _getImageFromGallery() async {
     final imagePicker = ImagePicker();
+    final fileChecker = FileExtensionChecker();
     final pickedImage =
         await imagePicker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
+
+    if (pickedImage != null &&
+        fileChecker.isImageFileByPath(pickedImage.path)) {
       return File(pickedImage.path);
     }
 

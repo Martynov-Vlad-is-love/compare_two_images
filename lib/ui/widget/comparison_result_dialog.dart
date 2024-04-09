@@ -11,7 +11,8 @@ class ComparisonResultDialog extends StatelessWidget {
   /// Constructor.
   const ComparisonResultDialog({
     required this.context,
-    required this.isEqual, super.key,
+    required this.isEqual,
+    super.key,
   });
 
   @override

@@ -16,12 +16,12 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  late final HistoryStorageController historyStorageController;
+  late final HistoryStorageController historyStorageController =
+      context.read<HistoryStorageController>();
 
   @override
   void initState() {
     super.initState();
-    historyStorageController = context.read<HistoryStorageController>();
     initHistory();
   }
 
@@ -35,6 +35,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     const contentText = 'Do you really want to delete this comparison?';
     final historyList = historyStorageController.historyList;
     final itemCount = historyList.length;
+    context.watch<HistoryStorageController>();
 
     return Scaffold(
       appBar: AppBar(
@@ -47,119 +48,119 @@ class _HistoryScreenState extends State<HistoryScreen> {
       body: SingleChildScrollView(
         physics: const ScrollPhysics(),
         child: Column(
-                children: <Widget>[
-                  ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: itemCount,
-                    itemBuilder: (__, index) {
+          children: <Widget>[
+            ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: itemCount,
+              itemBuilder: (__, index) {
+                final historyItem = historyList[index];
+                final firstImage =
+                    File(historyItem[Constant.firstImageKey] as String);
+                final secondImage =
+                    File(historyItem[Constant.secondImageKey] as String);
+                final isEqual = historyItem[Constant.isEqualKey] as bool;
+                final Color colorOfComparison =
+                    isEqual ? Colors.green : Colors.red;
+                final comparisonResult = isEqual ? 'Equal' : 'Not equal';
 
-                      final historyItem = historyList[index];
-                      final firstImage =
-                          File(historyItem[Constant.firstImageKey] as String);
-                      final secondImage =
-                          File(historyItem[Constant.secondImageKey] as String);
-                      final isEqual = historyItem[Constant.isEqualKey] as bool;
-                      final Color colorOfComparison =
-                          isEqual ? Colors.green : Colors.red;
-                      final comparisonResult = isEqual ? 'Equal' : 'Not equal';
-
-                      return SizedBox(
-                        width: size.width / 2,
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
+                return SizedBox(
+                  width: size.width / 2,
+                  child: Card(
+                    key: ValueKey(historyItem),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Constant.blueGreyColor,
+                                width: 4,
+                              ),
+                            ),
+                            height: 100,
+                            child: Row(
                               children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Constant.blueGreyColor,
-                                      width: 4,
-                                    ),
-                                  ),
-                                  height: 100,
+                                Expanded(
+                                  flex: 3,
                                   child: Row(
                                     children: [
                                       Expanded(
-                                        flex: 3,
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: Image.file(firstImage),
-                                            ),
-                                            const SizedBox(
-                                              width: 2,
-                                            ),
-                                            Expanded(
-                                              child: Image.file(secondImage),
-                                            ),
-                                          ],
-                                        ),
+                                        child: Image.file(firstImage),
                                       ),
                                       const SizedBox(
                                         width: 2,
                                       ),
                                       Expanded(
-                                        child: Container(
-                                          height: size.height,
-                                          width: size.width,
-                                          color: colorOfComparison,
-                                          child: Center(
-                                            child: Text(
-                                              comparisonResult,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                        child: Image.file(secondImage),
                                       ),
                                     ],
                                   ),
                                 ),
-                                Container(
-                                  decoration: const BoxDecoration(
-                                    color: Colors.blueGrey,
-                                    borderRadius: BorderRadius.vertical(
-                                      bottom: Radius.circular(20),
-                                    ),
-                                  ),
-                                  height: 40,
-                                  width: size.width,
-                                  child: Center(
-                                    child: IconButton(
-                                      icon: const Icon(Icons.delete),
-                                      onPressed: () async {
-                                        final dialogResult = await showDialog(
-                                          context: context,
-                                          builder: (_) {
-                                            return ConfirmDialog(
-                                              contentText: contentText,
-                                              context: context,
-                                            );
-                                          },
-                                        );
-                                        if (dialogResult == 'OK') {
-                                          await historyStorageController
-                                              .deleteImageComparisonFromStorage(
-                                            index,
-                                          );
-                                        }
-                                      },
+                                const SizedBox(
+                                  width: 2,
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    height: size.height,
+                                    width: size.width,
+                                    color: colorOfComparison,
+                                    child: Center(
+                                      child: Text(
+                                        comparisonResult,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      );
-                    },
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.blueGrey,
+                              borderRadius: BorderRadius.vertical(
+                                bottom: Radius.circular(20),
+                              ),
+                            ),
+                            height: 40,
+                            width: size.width,
+                            child: Center(
+                              child: IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () async {
+                                  final dialogResult = await showDialog(
+                                    context: context,
+                                    builder: (_) {
+                                      return ConfirmDialog(
+                                        contentText: contentText,
+                                        context: context,
+                                      );
+                                    },
+                                  );
+                                  if (dialogResult == 'OK') {
+                                    await historyStorageController
+                                        .deleteImageComparisonFromStorage(
+                                      index,
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

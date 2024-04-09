@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 class HistoryStorageController extends ChangeNotifier {
   final _historyStorage = HistoryStorage();
   List<Map<dynamic, dynamic>> _historyList = [];
+
   /// History comparison list.
   List<Map<dynamic, dynamic>> get historyList => _historyList;
 
@@ -42,6 +43,6 @@ class HistoryStorageController extends ChangeNotifier {
   ) async {
     await _historyStorage
         .deleteImageComparisonFromStorage(indexOfComparisonBox);
-    notifyListeners();
+    await getImageComparisonHistoryFromStorage();
   }
 }

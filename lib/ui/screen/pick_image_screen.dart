@@ -19,7 +19,7 @@ class PickImageScreen extends StatelessWidget {
             child: Text('Image Comparison'),
           ),
           leading: Builder(
-            builder:(context) => IconButton(
+            builder: (context) => IconButton(
               onPressed: () {
                 Navigator.push(
                   context,
