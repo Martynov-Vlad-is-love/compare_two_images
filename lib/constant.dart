@@ -10,4 +10,16 @@ class Constant {
 
   /// Grey color.
   static const Color greyColor = Colors.grey;
+
+  /// Grey color.
+  static const Color blueGreyColor = Colors.blueGrey;
+
+  ///
+  static const String firstImageKey = 'firstImagePath';
+
+  ///
+  static const String secondImageKey = 'secondImagePath';
+
+  ///
+  static const String isEqualKey = 'isEqual';
 }

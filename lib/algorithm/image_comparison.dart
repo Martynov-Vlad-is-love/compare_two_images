@@ -7,14 +7,15 @@ import 'package:image_picker/image_picker.dart';
 class ImageComparison extends ChangeNotifier {
   File? _firstFileImage;
   File? _secondFileImage;
+  bool _isImageEqual = false;
 
-  /// Difference of images in bool value
-  bool isImageDifferent = false;
+  /// Difference of images in bool value.
+  bool get isImageEqual => _isImageEqual;
 
-  /// Get first image file
+  /// Get first image file.
   File? get firstFileImage => _firstFileImage;
 
-  /// Get second image file
+  /// Get second image file.
   File? get secondFileImage => _secondFileImage;
 
   /// Method to set image from gallery.
@@ -45,7 +46,7 @@ class ImageComparison extends ChangeNotifier {
   Future<void> compareImages() async {
     final Uint8List? bytes1 = await firstFileImage?.readAsBytes();
     final Uint8List? bytes2 = await secondFileImage?.readAsBytes();
-    isImageDifferent = await _compareImagesBytes(bytes1, bytes2);
+    _isImageEqual = await _compareImagesBytes(bytes1, bytes2);
 
     notifyListeners();
   }

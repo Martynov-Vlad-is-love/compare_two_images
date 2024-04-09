@@ -8,7 +8,7 @@ class ImageFileWithBorder extends StatelessWidget {
   /// Constructor.
   const ImageFileWithBorder({
     required this.screenSize,
-    required this.image1,
+    required this.image,
     super.key,
   });
 
@@ -16,18 +16,18 @@ class ImageFileWithBorder extends StatelessWidget {
   final Size screenSize;
 
   /// Given image
-  final File image1;
+  final File image;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Constant.greyColor, width: 4),
+        border: Border.all(color: Constant.blueGreyColor, width: 4),
       ),
       width: screenSize.width * 2 / 3,
-      height: Image.file(image1).height,
+      height: Image.file(image).height,
       child: Image.file(
-        image1,
+        image,
       ),
     );
   }

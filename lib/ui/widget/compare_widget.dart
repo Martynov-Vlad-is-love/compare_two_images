@@ -1,5 +1,7 @@
 import 'package:compare_two_images/algorithm/image_comparison.dart';
 import 'package:compare_two_images/constant.dart';
+import 'package:compare_two_images/controller/history_storage_controller.dart';
+import 'package:compare_two_images/ui/widget/comparison_result_dialog.dart';
 import 'package:compare_two_images/ui/widget/empty_image_widget.dart';
 import 'package:compare_two_images/ui/widget/image_file_with_border.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +16,18 @@ class CompareWidget extends StatelessWidget {
     final image2 = images.secondFileImage;
     final size = MediaQuery.of(context).size;
     Color color = Constant.greyColor;
+    final historyStorage = context.watch<HistoryStorageController>();
+
+    final firstImageWidget = image1 != null
+        ? ImageFileWithBorder(screenSize: size, image: image1)
+        : EmptyImageWidget(screenSize: size);
+    final secondImageWidget = image2 != null
+        ? ImageFileWithBorder(screenSize: size, image: image2)
+        : EmptyImageWidget(screenSize: size);
 
     final widgets = <Widget>[
       Padding(
-        padding: const EdgeInsets.only(bottom: 25),
+        padding: const EdgeInsets.only(bottom: 25, top: 25),
         child: Container(
           width: size.width / 2,
           height: size.height / 19,
@@ -28,31 +38,19 @@ class CompareWidget extends StatelessWidget {
           child: Center(
             child: Text(
               textAlign: TextAlign.center,
-              'Is equal: ${images.isImageDifferent}',
+              'Is equal: ${images.isImageEqual}',
               style: const TextStyle(fontSize: 20),
             ),
           ),
         ),
       ),
-      if (image1 != null)
         Padding(
           padding: const EdgeInsets.only(bottom: 5.0),
-          child: ImageFileWithBorder(screenSize: size, image1: image1),
-        )
-      else
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
-          child: EmptyImageWidget(screenSize: size),
+          child: firstImageWidget,
         ),
-      if (image2 != null)
         Padding(
           padding: const EdgeInsets.only(bottom: 5.0),
-          child: ImageFileWithBorder(screenSize: size, image1: image2),
-        )
-      else
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0),
-          child: EmptyImageWidget(screenSize: size),
+          child: secondImageWidget,
         ),
       ElevatedButton(
         onPressed: () async => images.setFirstImageFromGallery(),
@@ -65,24 +63,35 @@ class CompareWidget extends StatelessWidget {
       ElevatedButton(
         onPressed: () async {
           await images.compareImages();
-          color = images.isImageDifferent == false
-              ? Constant.redColor
-              : Constant.greenColor;
+          final isImagesEqual = images.isImageEqual;
+
+          color =
+              isImagesEqual == false ? Constant.redColor : Constant.greenColor;
+
+          await historyStorage.addImageComparisonToHistoryStorage(
+            images,
+            isImagesEqual: isImagesEqual,
+          );
+
+          await showDialog(
+            builder: (_) {
+              return ComparisonResultDialog(
+                context: context,
+                isEqual: isImagesEqual,
+              );
+            },
+            context: context,
+          );
         },
         child: const Text('Compare images'),
       ),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Image Comparison'),
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: widgets,
-          ),
+    return SingleChildScrollView(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: widgets,
         ),
       ),
     );

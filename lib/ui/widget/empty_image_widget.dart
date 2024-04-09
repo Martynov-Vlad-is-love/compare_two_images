@@ -18,7 +18,7 @@ class EmptyImageWidget extends StatelessWidget {
       width: screenSize.width / 2,
       height: screenSize.height / 4,
       decoration: BoxDecoration(
-        border: Border.all(color: Constant.greyColor, width: 3),
+        border: Border.all(color: Constant.blueGreyColor, width: 3),
         borderRadius: const BorderRadius.all(Radius.circular(20)),
       ),
       child: const Center(
