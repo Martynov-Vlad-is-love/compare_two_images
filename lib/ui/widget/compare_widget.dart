@@ -66,7 +66,7 @@ class CompareWidget extends StatelessWidget {
                 if (firstImagePath != null && secondImagePath != null) {
                   if (fileChecker.compareFileExtensionsByImagePath(
                     firstImagePath,
-                    firstImagePath,
+                    secondImagePath,
                   )) {
                     await images.compareImages();
                     final isImagesEqual = images.isImageEqual;
