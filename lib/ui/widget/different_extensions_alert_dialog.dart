@@ -11,8 +11,7 @@ class DifferentExtensionsAlertDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Oops'),
-      content:
-      const Text('Image extensions are different.'),
+      content: const Text('Image extensions are different.'),
       actions: [
         TextButton(
           onPressed: () {

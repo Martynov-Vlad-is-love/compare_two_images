@@ -18,9 +18,7 @@ class CompareWidget extends StatelessWidget {
     final images = context.watch<ImageComparison>();
     final image1 = images.firstFileImage;
     final image2 = images.secondFileImage;
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     final historyStorage = context.watch<HistoryStorageController>();
 
     final firstImageWidget = image1 != null
